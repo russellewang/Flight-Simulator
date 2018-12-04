@@ -19,6 +19,9 @@ class Window
 public:
 	static int width;
 	static int height;
+	static bool left_click;
+	static double xmouse;
+	static double ymouse;
 	static glm::mat4 P; // P for projection
 	static glm::mat4 V; // V for view
 	static void initialize_objects();
@@ -28,6 +31,10 @@ public:
 	static void idle_callback();
 	static void display_callback(GLFWwindow*);
 	static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+	static glm::vec3 Window::trackBallMapping(double x, double y);
+	static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 };
 
 #endif

@@ -14,6 +14,13 @@ glm::vec3 cam_pos(0.0f, 200.0f, 200.0f);		// e  | Position of camera
 glm::vec3 cam_look_at(0.0f, 0.0f, 0.0f);	// d  | This is where the camera looks at
 glm::vec3 cam_up(0.0f, 1.0f, 0.0f);			// up | What orientation "up" is
 
+glm::vec3 beginpoint;
+glm::vec3 endpoint;
+double Window::xmouse = 0;
+double Window::ymouse = 0;
+bool Window::left_click = false;
+
+
 int Window::width;
 int Window::height;
 
@@ -134,4 +141,81 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
 			glfwSetWindowShouldClose(window, GL_TRUE);
 		}
 	}
+}
+
+void Window::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+
+	if (action == GLFW_PRESS) {
+		if (button == GLFW_MOUSE_BUTTON_LEFT) {
+			left_click = true;
+			glfwGetCursorPos(window, &xmouse, &ymouse);
+		}
+
+	}
+
+	if (action == GLFW_RELEASE) {
+		if (button == GLFW_MOUSE_BUTTON_LEFT) {
+			left_click = false;
+		}
+	}
+
+}
+
+void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+	/*double newScale = 1.0;
+	if (yoffset > 0) {
+		newScale += yoffset * 0.1;
+	}
+	else {
+		newScale += yoffset * 0.1;
+	}*/
+	glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, yoffset*5.0f));
+	V = translation * V;
+
+
+}
+
+void Window::cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
+
+	if (left_click) {
+
+
+		double newxpos = 0;
+		double newypos = 0;
+		glfwGetCursorPos(window, &newxpos, &newypos);
+
+		beginpoint = trackBallMapping(xmouse, ymouse);
+		endpoint = trackBallMapping(newxpos, newypos);
+
+		float angle = glm::acos((glm::dot(beginpoint, endpoint) / (glm::length(beginpoint)*glm::length(endpoint))));
+		glm::vec3 vector = glm::cross(beginpoint, endpoint);
+
+		glm::mat4 translation = glm::rotate(glm::mat4(1.0f), angle / 180.0f * glm::pi<float>(), vector);
+		//camera->rotate(angle, vector);
+		cam_pos = glm::vec3(translation * glm::vec4(cam_pos, 0.0));
+		cam_up = glm::vec3(translation * glm::vec4(cam_up, 0.0));
+		
+		V = glm::lookAt(cam_pos, cam_look_at, cam_up);
+		
+		
+		beginpoint = endpoint;
+	}
+
+}
+
+
+
+
+glm::vec3 Window::trackBallMapping(double x, double y)    // The CPoint class is a specific Windows class. Either use separate x and y values for the mouse location, or use a Vector3 in which you ignore the z coordinate.
+{
+	glm::vec3 v;    // Vector v is the synthesized 3D position of the mouse location on the trackball
+	float d;     // this is the depth of the mouse location: the delta between the plane through the center of the trackball and the z position of the mouse
+	v.x = (2.0*x - width) / width;   // this calculates the mouse X position in trackball coordinates, which range from -1 to +1
+	v.y = (height - 2.0*y) / height;   // this does the equivalent to the above for the mouse Y position
+	v.z = 0.0;   // initially the mouse z position is set to zero, but this will change below
+	d = glm::length(v);    // this is the distance from the trackball's origin to the mouse location, without considering depth (=in the plane of the trackball's origin)
+	d = (d < 1.0) ? d : 1.0;   // this limits d to values of 1.0 or less to avoid square roots of negative values in the following line
+	v.z = sqrtf(1.001 - d * d);  // this calculates the Z coordinate of the mouse position on the trackball, based on Pythagoras: v.z*v.z + d*d = 1*1
+	glm::normalize(v); // Still need to normalize, since we only capped d, not v.
+	return v;  // return the mouse location on the surface of the trackball
 }

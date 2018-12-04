@@ -21,11 +21,17 @@ using namespace std;
 class Terrain {
 
 private:
+
+
+	GLuint texture1;
+	GLuint texture2;
+	GLuint texture3;
+	GLuint texture4;
 	vector<glm::vec3> vertices;
 	vector<glm::vec3> normals;
 	vector<glm::vec2> textures;
 	vector<unsigned int> indices;
-	GLuint VAO, VBO, EBO;
+	GLuint VAO, VBO, EBO, VBO2;
 	float * heightMap;
 	void setUpTerrain();
 
@@ -37,7 +43,9 @@ public:
 	~Terrain();
 	unsigned char* loadPPM(const char* filename, int& width, int& height);
 	void draw(GLuint);
-
+	void diamondSquare(int);
+	void diamondSquare(int, int, int, int, int);
+	GLuint loadTerrain(const char*);
 
 
 
