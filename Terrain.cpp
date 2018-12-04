@@ -1,6 +1,6 @@
 #include "Terrain.h"
 #include "Window.h"
-#define WIDTH 128
+#define WIDTH 32
 #define RANGE 4
 
 Terrain::Terrain() {
@@ -23,7 +23,7 @@ Terrain::Terrain() {
 	for (int i = 0; i < WIDTH; i++) {
 		
 		for (int j = 0; j < WIDTH; j++) {
-			vertices.push_back(glm::vec3((float)j - (WIDTH/2), 0.0, (float)i - (WIDTH / 2)));
+			vertices.push_back(glm::vec3((float)j*20, 0.0, (float)i * 20));
 			normals.push_back(glm::vec3(0.0, 1.0, 0.0));
 			textures.push_back(glm::vec2(j, i ));
 			if (j != WIDTH - 1 || i != WIDTH - 1) {
@@ -44,7 +44,7 @@ Terrain::Terrain() {
 		
 	}
 	float ran = 20;
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 2; i++) {
 		diamondSquare(ran);
 		ran /= 1.1f;
 	}
@@ -222,6 +222,7 @@ void Terrain::draw(GLuint shaderProgram) {
 	//glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &toWorld[0][0]);
 	//glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, &Window::V[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelview"), 1, GL_FALSE, &modelview[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &toWorld[0][0]);
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, &Window::P[0][0]);
 
