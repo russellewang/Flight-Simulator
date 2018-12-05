@@ -1,24 +1,12 @@
 #include "Terrain.h"
 #include "Window.h"
-#define WIDTH 32
+#define WIDTH 125
 #define RANGE 4
 
 Terrain::Terrain() {
 	
 	toWorld = glm::mat4(1.0f);
-	/*
-	vertices.push_back(glm::vec3(0.0, 0.0, 0.0));
-	vertices.push_back(glm::vec3(2, 1.0, 0));
-	vertices.push_back(glm::vec3(0, 2.0, 2));
-	vertices.push_back(glm::vec3(2, 3.0, 2));
-	indices.push_back(0);
-	indices.push_back(1);
-	indices.push_back(3);
-	indices.push_back(3);
-	indices.push_back(2);
-	indices.push_back(0);
-	*/
-	//generate height map
+	
 	
 	for (int i = 0; i < WIDTH; i++) {
 		
@@ -43,11 +31,12 @@ Terrain::Terrain() {
 		}
 		
 	}
+
+	//diamondSquare(0, WIDTH, 0, WIDTH, WIDTH - 1, 20.0f);
+	
 	float ran = 20;
-	for (int i = 0; i < 2; i++) {
-		diamondSquare(ran);
-		ran /= 1.1f;
-	}
+	diamondSquare(ran);
+
 	setUpTerrain();
 }
 
@@ -154,16 +143,28 @@ unsigned char* Terrain::loadPPM(const char* filename, int& width, int& height) {
 	return rawData;
 }
 
-void Terrain::diamondSquare(int x1, int x2, int y1, int y2, int steps) {
-
-}
+/*
+void Terrain::diamondSquare(int x1, int x2, int y1, int y2, int level, float range) {
+	if (steps <= 1) {
+		return;
+	}
+	int halfstep = steps / 2;
+	float topL = vertices[y1*WIDTH + x1].y;
+	float topR = vertices[y1*WIDTH + (x1 + steps)].y;
+	float botL = vertices[(y1 + steps)*WIDTH + x1].y;
+	float botR = vertices[(y1 + steps)*WIDTH + (x1 + steps)].y;
+	float random = ((float)(rand()) / float(RAND_MAX)) * range - (range / 2);
+	float average = (topL + topR + botL + botR) / 4;
+	vertices[(x1 + halfstep)*WIDTH + (y1 + halfstep)].y = average + random;
+	int val = average + random; 
+}*/
 
 void Terrain::diamondSquare(int ran) {
 	int steps = WIDTH-1;
 	float range = ran;
 	while (steps > 1) {
 		int halfstep = steps / 2;
-
+		int val = 0;
 		//diamond
 		for (int i = 0; i < WIDTH-1; i+= steps) {
 			for (int j = 0; j < WIDTH-1; j+= steps) {
@@ -174,6 +175,7 @@ void Terrain::diamondSquare(int ran) {
 				float random = ((float) (rand()) / float(RAND_MAX)) * range - (range / 2);
 				float average = (topL + topR + botL + botR) / 4;
 				vertices[(i + halfstep)*WIDTH + (j + halfstep)].y = average + random;
+				val = average + random;
 			}
 		}
 
@@ -186,24 +188,33 @@ void Terrain::diamondSquare(int ran) {
 			}
 			for (int j = start; j < WIDTH; j += halfstep) {
 				float left = 0;
+				float random = ((float)(rand()) / float(RAND_MAX)) * range - (range / 2);
 				if (j - halfstep >= 0) {
-					left = vertices[(j - halfstep) + (i*WIDTH)].y;
+					//left = vertices[(j - halfstep) + (i*WIDTH)].y;
+					vertices[(j - halfstep) + (i*WIDTH)].y = val + random;
+
 				}
 				float right = 0;
 				if (j + halfstep < WIDTH) {
-					left = vertices[(j + halfstep) + (i*WIDTH)].y;
+					//left = vertices[(j + halfstep) + (i*WIDTH)].y;
+					vertices[(j + halfstep) + (i*WIDTH)].y = val + random;
+
 				}
 				float up = 0;
 				float down = 0;
 				if (i + halfstep < WIDTH) {
-					up = vertices[j + ((i + halfstep) * WIDTH)].y;
+					//up = vertices[j + ((i + halfstep) * WIDTH)].y;
+					vertices[j + ((i + halfstep) * WIDTH)].y = val + random;
+
 				}
 				if (i - halfstep >= 0) {
-					up = vertices[j + ((i - halfstep) * WIDTH)].y;
+					//up = vertices[j + ((i - halfstep) * WIDTH)].y;
+					vertices[j + ((i - halfstep) * WIDTH)].y = val + random;
+
 				}
-				float random = ((float)(rand()) / float(RAND_MAX)) * range - (range / 2);
-				float average = (up+down+left+right) / 4;
-				vertices[i*WIDTH+j].y = average + random;
+				//random = ((float)(rand()) / float(RAND_MAX)) * range - (range / 2);
+				//float average = (up+down+left+right) / 4;
+				//vertices[i*WIDTH+j].y = average + random;
 			}
 			evenstep = !evenstep;
 		}
@@ -264,16 +275,11 @@ GLuint Terrain::loadTerrain(const char* filename) {
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	image = loadPPM(filename, width, height);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-	//Make sure no bytes are padded:
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	//Use bilinear interpolation:
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	//Use clamp to edge:
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);//X
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);//Y
-	//Unbind the texture cube map.
 	glBindTexture(GL_TEXTURE_2D, 0);
-	//Return the textureID, we need to keep track of this texture variable.
 	return textureID;
 }
