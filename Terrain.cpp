@@ -1,43 +1,51 @@
 #include "Terrain.h"
 #include "Window.h"
-#define WIDTH 125
-#define RANGE 4
+#define WIDTH 257
+#define RANGE 20.0f
 
 Terrain::Terrain() {
 	
 	toWorld = glm::mat4(1.0f);
 	
-	
 	for (int i = 0; i < WIDTH; i++) {
 		
 		for (int j = 0; j < WIDTH; j++) {
-			vertices.push_back(glm::vec3((float)j*20, 0.0, (float)i * 20));
+			vertices.push_back(glm::vec3((float)j*2-(WIDTH), 0.0, (float)i*2 - (WIDTH)));
 			normals.push_back(glm::vec3(0.0, 1.0, 0.0));
 			textures.push_back(glm::vec2(j, i ));
-			if (j != WIDTH - 1 || i != WIDTH - 1) {
-				int bLeft = i * WIDTH + j;
-				int tLeft = (i+1)* WIDTH + j;
-				int tRight = tLeft + 1;
-				int bRight = bLeft + 1;
-				indices.push_back(tLeft);
-				indices.push_back(bLeft);
-				indices.push_back(tRight);
-				indices.push_back(tRight);
-				indices.push_back(bLeft);
-				indices.push_back(bRight);
-			}
 			
-			//cout << vertices[j].x << +"...." << vertices[j].z << endl;
 		}
 		
 	}
+	for (int i = 0; i < WIDTH - 1; i++) {
+		for (int j = 0; j < WIDTH - 1; j++) {
+			int tLeft = i * WIDTH + j;
+			int bLeft = (i + 1)* WIDTH + j;
+			int tRight = tLeft + 1;
+			int bRight = bLeft + 1;
+			indices.push_back(tLeft);
+			indices.push_back(bLeft);
+			indices.push_back(tRight);
+			indices.push_back(tRight);
+			indices.push_back(bLeft);
+			indices.push_back(bRight);
+		}
+	}
 
-	//diamondSquare(0, WIDTH, 0, WIDTH, WIDTH - 1, 20.0f);
+	diamondSquare(RANGE);
+
 	
-	float ran = 20;
-	diamondSquare(ran);
+	/*
+	cout << setprecision(2) << fixed;
+	for (int i = 0; i < WIDTH; i++) {
+		for (int j = 0; j < WIDTH; j++) {
+			cout << vertices[i*WIDTH + j].y << " ";
+		}
+		cout << endl;
+	}*/
 
 	setUpTerrain();
+	
 }
 
 
@@ -143,28 +151,27 @@ unsigned char* Terrain::loadPPM(const char* filename, int& width, int& height) {
 	return rawData;
 }
 
-/*
-void Terrain::diamondSquare(int x1, int x2, int y1, int y2, int level, float range) {
-	if (steps <= 1) {
-		return;
-	}
-	int halfstep = steps / 2;
-	float topL = vertices[y1*WIDTH + x1].y;
-	float topR = vertices[y1*WIDTH + (x1 + steps)].y;
-	float botL = vertices[(y1 + steps)*WIDTH + x1].y;
-	float botR = vertices[(y1 + steps)*WIDTH + (x1 + steps)].y;
-	float random = ((float)(rand()) / float(RAND_MAX)) * range - (range / 2);
-	float average = (topL + topR + botL + botR) / 4;
-	vertices[(x1 + halfstep)*WIDTH + (y1 + halfstep)].y = average + random;
-	int val = average + random; 
-}*/
 
-void Terrain::diamondSquare(int ran) {
+
+void Terrain::diamondSquare(float ran) {
 	int steps = WIDTH-1;
 	float range = ran;
+
+	int count = 1;
+	//init corners
+	/*
+	float random = fRand(-range, range);
+	vertices[0].y = random;
+	random = fRand(-range, range);
+	vertices[WIDTH - 1].y = random;
+	random = fRand(-range, range);
+	vertices[(WIDTH - 1)*WIDTH].y = random;
+	random = fRand(-range, range);
+	vertices[(WIDTH*WIDTH) - 1].y = random;
+	*/
+
 	while (steps > 1) {
 		int halfstep = steps / 2;
-		int val = 0;
 		//diamond
 		for (int i = 0; i < WIDTH-1; i+= steps) {
 			for (int j = 0; j < WIDTH-1; j+= steps) {
@@ -172,10 +179,11 @@ void Terrain::diamondSquare(int ran) {
 				float topR = vertices[i*WIDTH + (j + steps)].y;
 				float botL = vertices[(i + steps)*WIDTH + j].y;
 				float botR = vertices[(i + steps)*WIDTH + (j+steps)].y;
-				float random = ((float) (rand()) / float(RAND_MAX)) * range - (range / 2);
-				float average = (topL + topR + botL + botR) / 4;
+				float random = fRand(-range, range);
+				float average = (topL + topR + botL + botR) / 4.0;
 				vertices[(i + halfstep)*WIDTH + (j + halfstep)].y = average + random;
-				val = average + random;
+				//vertices[(i + halfstep)*WIDTH + (j + halfstep)].y = count++;
+				//count = 2;
 			}
 		}
 
@@ -183,43 +191,42 @@ void Terrain::diamondSquare(int ran) {
 		bool evenstep = true;
 		for (int i = 0; i < WIDTH; i += halfstep) {
 			int start = 0;
-			if (!evenstep) {
+			if (evenstep) {
 				start = halfstep;
 			}
 			for (int j = start; j < WIDTH; j += halfstep) {
 				float left = 0;
-				float random = ((float)(rand()) / float(RAND_MAX)) * range - (range / 2);
 				if (j - halfstep >= 0) {
-					//left = vertices[(j - halfstep) + (i*WIDTH)].y;
-					vertices[(j - halfstep) + (i*WIDTH)].y = val + random;
+					left = vertices[(j - halfstep) + (i*WIDTH)].y;
 
 				}
 				float right = 0;
 				if (j + halfstep < WIDTH) {
-					//left = vertices[(j + halfstep) + (i*WIDTH)].y;
-					vertices[(j + halfstep) + (i*WIDTH)].y = val + random;
+					right = vertices[(j + halfstep) + (i*WIDTH)].y;
 
 				}
 				float up = 0;
 				float down = 0;
 				if (i + halfstep < WIDTH) {
-					//up = vertices[j + ((i + halfstep) * WIDTH)].y;
-					vertices[j + ((i + halfstep) * WIDTH)].y = val + random;
+					down = vertices[j + ((i + halfstep) * WIDTH)].y;
 
 				}
 				if (i - halfstep >= 0) {
-					//up = vertices[j + ((i - halfstep) * WIDTH)].y;
-					vertices[j + ((i - halfstep) * WIDTH)].y = val + random;
+					up = vertices[j + ((i - halfstep) * WIDTH)].y;
 
 				}
-				//random = ((float)(rand()) / float(RAND_MAX)) * range - (range / 2);
-				//float average = (up+down+left+right) / 4;
-				//vertices[i*WIDTH+j].y = average + random;
+				float random = fRand(-range, range);
+				float average = (up+down+left+right) / 4;
+				vertices[i*WIDTH+j].y = average + random;
+				//vertices[i*WIDTH + j].y = count++;
+				//count = 2;
 			}
+			cout << evenstep << "..." << endl;
 			evenstep = !evenstep;
+			//cout << evenstep << endl;
 		}
 		steps = steps / 2;
-		range = range/1.1f;
+		range = range / 1.5f;
 
 	}
 }
@@ -278,8 +285,14 @@ GLuint Terrain::loadTerrain(const char* filename) {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);//X
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);//Y
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	return textureID;
+}
+
+float Terrain::fRand(float min, float max)
+{
+	float f = (float)rand() / RAND_MAX;
+	return min + f * (max - min);
 }

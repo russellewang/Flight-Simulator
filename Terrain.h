@@ -14,7 +14,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>   
+#include <time.h>
+#include <iomanip>
 #include <iostream> 
+#define WIDTH 64
 
 using namespace std;
 
@@ -30,6 +33,7 @@ private:
 	vector<glm::vec3> vertices;
 	vector<glm::vec3> normals;
 	vector<glm::vec2> textures;
+	float tempArray[WIDTH][WIDTH];
 	vector<unsigned int> indices;
 	GLuint VAO, VBO, EBO, VBO2;
 	float * heightMap;
@@ -43,11 +47,10 @@ public:
 	~Terrain();
 	unsigned char* loadPPM(const char* filename, int& width, int& height);
 	void draw(GLuint);
-	void diamondSquare(int);
-	void diamondSquare(int, int, int, int, int, float);
+	void diamondSquare(float);
+	void diamond_square(int x1, int x2, int y1, int y2, int level, float range);
 	GLuint loadTerrain(const char*);
-
-
+	float fRand(float, float);
 
 };
 
