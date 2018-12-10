@@ -13,6 +13,7 @@
 #include "Cube.h"
 #include "shader.h"
 #include "Terrain.h"
+#include "Water.h"
 
 class Window
 {

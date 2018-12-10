@@ -30,6 +30,12 @@
     <ClInclude Include="..\Terrain.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Water.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\main.cpp">
@@ -47,6 +53,12 @@
     <ClCompile Include="..\Terrain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Water.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\shader.frag">
@@ -56,5 +68,17 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="..\waterShader.frag">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\waterShader.vert">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\skyboxshader.vert">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\skyboxshader.frag">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

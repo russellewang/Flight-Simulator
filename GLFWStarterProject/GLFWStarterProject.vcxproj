@@ -22,19 +22,27 @@
     <ClInclude Include="..\Cube.h" />
     <ClInclude Include="..\main.h" />
     <ClInclude Include="..\shader.h" />
+    <ClInclude Include="..\Skybox.h" />
     <ClInclude Include="..\Terrain.h" />
+    <ClInclude Include="..\Water.h" />
     <ClInclude Include="..\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Cube.cpp" />
     <ClCompile Include="..\main.cpp" />
     <ClCompile Include="..\shader.cpp" />
+    <ClCompile Include="..\Skybox.cpp" />
     <ClCompile Include="..\Terrain.cpp" />
+    <ClCompile Include="..\Water.cpp" />
     <ClCompile Include="..\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\shader.frag" />
     <None Include="..\shader.vert" />
+    <None Include="..\skyboxshader.frag" />
+    <None Include="..\skyboxshader.vert" />
+    <None Include="..\waterShader.frag" />
+    <None Include="..\waterShader.vert" />
     <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

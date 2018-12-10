@@ -1,13 +1,13 @@
 #include "window.h"
 
 const char* window_title = "GLFW Starter Project";
-Cube * cube;
 Terrain * terrain;
-GLint shaderProgram;
+Water * water;
+GLint terrainShaderProgram;
+GLint waterShaderProgram;
 
 // On some systems you need to change this to the absolute path
-#define VERTEX_SHADER_PATH "../shader.vert"
-#define FRAGMENT_SHADER_PATH "../shader.frag"
+
 
 // Default camera parameters
 glm::vec3 cam_pos(0.0f, 30.0f, 30.0f);		// e  | Position of camera
@@ -29,17 +29,20 @@ glm::mat4 Window::V;
 
 void Window::initialize_objects()
 {
-	cube = new Cube();
 	terrain = new Terrain();
+	water = new Water();
 	// Load the shader program. Make sure you have the correct filepath up top
-	shaderProgram = LoadShaders(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
+	terrainShaderProgram = LoadShaders("../terrainShader.vert", "../terrainShader.frag");
+	waterShaderProgram = LoadShaders("../waterShader.vert", "../waterShader.frag");
+
 }
 
 // Treat this as a destructor function. Delete dynamically allocated memory here.
 void Window::clean_up()
 {
-	delete(cube);
-	glDeleteProgram(shaderProgram);
+	glDeleteProgram(terrainShaderProgram);
+	glDeleteProgram(waterShaderProgram);
+
 }
 
 GLFWwindow* Window::create_window(int width, int height)
@@ -109,7 +112,6 @@ void Window::resize_callback(GLFWwindow* window, int width, int height)
 void Window::idle_callback()
 {
 	// Call the update function the cube
-	cube->update();
 }
 
 void Window::display_callback(GLFWwindow* window)
@@ -117,12 +119,15 @@ void Window::display_callback(GLFWwindow* window)
 	// Clear the color and depth buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glUseProgram(waterShaderProgram);
+	water->draw(waterShaderProgram);
+
 	// Use the shader of programID
-	glUseProgram(shaderProgram);
+	glUseProgram(terrainShaderProgram);
 	
 	// Render the cube
 	//cube->draw(shaderProgram);
-	terrain->draw(shaderProgram);
+	terrain->draw(terrainShaderProgram);
 	// Gets events, including input such as keyboard and mouse or window resizing
 	glfwPollEvents();
 	// Swap buffers

@@ -14,10 +14,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>   
-#include <time.h>
 #include <iomanip>
 #include <iostream> 
-#define WIDTH 64
 
 using namespace std;
 
@@ -33,10 +31,8 @@ private:
 	vector<glm::vec3> vertices;
 	vector<glm::vec3> normals;
 	vector<glm::vec2> textures;
-	float tempArray[WIDTH][WIDTH];
 	vector<unsigned int> indices;
 	GLuint VAO, VBO, EBO, VBO2;
-	float * heightMap;
 	void setUpTerrain();
 
 public:
