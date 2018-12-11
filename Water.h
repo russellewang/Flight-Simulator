@@ -22,25 +22,28 @@ using namespace std;
 class Water {
 
 private:
-	GLuint texture1;
-	GLuint texture2;
-	GLuint texture3;
-	GLuint texture4;
 	vector<glm::vec3> vertices;
 	vector<glm::vec3> normals;
 	vector<glm::vec2> textures;
 	vector<unsigned int> indices;
-	GLuint VAO, VBO, EBO, VBO2;
+	GLuint VAO, VBO, EBO, VBO2, VBO3;
 	void setUpWater();
 	GLuint skytexture;
 
 public:
 	glm::mat4 toWorld;
+	GLuint dudvmap;
+	GLuint sky;
+	GLuint ground;
+	float speed;
+
 	unsigned char* loadPPM(const char* filename, int& width, int& height);
 	unsigned int loadCubemap(vector<const GLchar*> faces);
 	Water();
 	~Water();
 	void draw(GLuint);
+	GLuint loadTexture(const char*);
+
 
 
 

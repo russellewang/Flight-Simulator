@@ -37,10 +37,10 @@
     <ClCompile Include="..\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\shader.frag" />
-    <None Include="..\shader.vert" />
     <None Include="..\skyboxshader.frag" />
     <None Include="..\skyboxshader.vert" />
+    <None Include="..\terrainShader.frag" />
+    <None Include="..\terrainShader.vert" />
     <None Include="..\waterShader.frag" />
     <None Include="..\waterShader.vert" />
     <None Include="packages.config" />

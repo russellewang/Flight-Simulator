@@ -1,7 +1,7 @@
 #include "Terrain.h"
 #include "Window.h"
 #define WIDTH 257
-#define RANGE 20.0f
+#define RANGE 30.0f
 
 Terrain::Terrain() {
 	
@@ -10,10 +10,17 @@ Terrain::Terrain() {
 	for (int i = 0; i < WIDTH; i++) {
 		
 		for (int j = 0; j < WIDTH; j++) {
-			vertices.push_back(glm::vec3((float)j*2-(WIDTH), 0.0, (float)i*2 - (WIDTH)));
+			int offset = 0;
+			if(j < WIDTH/2){
+				offset = 4.0f;
+			}
+			vertices.push_back(glm::vec3((float)j*10-(WIDTH*5), offset, (float)i*10 - (WIDTH*5)));
+			//vertices.push_back(glm::vec3((float)j - WIDTH/2, offset, (float)i - WIDTH / 2));
+
 			normals.push_back(glm::vec3(0.0, 1.0, 0.0));
-			textures.push_back(glm::vec2(j, i ));
-			
+			//textures.push_back(glm::vec2(j * 10 - (WIDTH * 5), i * 10 - (WIDTH * 5)));
+			textures.push_back(glm::vec2(j, i));
+
 		}
 		
 	}
@@ -221,9 +228,7 @@ void Terrain::diamondSquare(float ran) {
 				//vertices[i*WIDTH + j].y = count++;
 				//count = 2;
 			}
-			cout << evenstep << "..." << endl;
 			evenstep = !evenstep;
-			//cout << evenstep << endl;
 		}
 		steps = steps / 2;
 		range = range / 1.5f;
@@ -247,19 +252,19 @@ void Terrain::draw(GLuint shaderProgram) {
 	// Now draw the cube. We simply need to bind the VAO associated with it.
 	glBindVertexArray(VAO);
 
-	glActiveTexture(GL_TEXTURE0);//Enable the texture.
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->texture1);
 	glUniform1i(glGetUniformLocation(shaderProgram, "terrain1"), 0);
 
-	glActiveTexture(GL_TEXTURE1);//Enable the texture.
+	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, this->texture2);
 	glUniform1i(glGetUniformLocation(shaderProgram, "terrain2"), 1);
 
-	glActiveTexture(GL_TEXTURE2);//Enable the texture.
+	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, this->texture3);
 	glUniform1i(glGetUniformLocation(shaderProgram, "terrain3"), 2);
 
-	glActiveTexture(GL_TEXTURE3);//Enable the texture.
+	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, this->texture4);
 	glUniform1i(glGetUniformLocation(shaderProgram, "terrain4"), 3);
 

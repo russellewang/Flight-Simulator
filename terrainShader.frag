@@ -23,11 +23,11 @@ void main()
     // Color everything a hot pink color. An alpha of 1.0f means it is not transparent.
     //color = vec4(1.0f, 1.0f, 1.0f, sampleExtraOutput);
 	
-	if(FragPos.y > 1.5f){
-		color = texture(terrain4, FragTexCoords) * 0.7f;
+	if(FragPos.y > 2.5f){
+		color = texture(terrain4, FragTexCoords) * 0.5f;
 		color += texture(terrain3, FragTexCoords) * 0.3f;
 	}
-	else if(FragPos.y > 1.4f){
+	else if(FragPos.y > 1.7f){
 		color = texture(terrain4, FragTexCoords) * 0.5f;
 		color += texture(terrain3, FragTexCoords) * 0.5f;
 	}

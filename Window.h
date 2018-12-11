@@ -14,6 +14,7 @@
 #include "shader.h"
 #include "Terrain.h"
 #include "Water.h"
+#include "Skybox.h"
 
 class Window
 {
@@ -23,6 +24,9 @@ public:
 	static bool left_click;
 	static double xmouse;
 	static double ymouse;
+	static glm::vec3 cam_pos;
+	static glm::vec3 cam_look_at;
+	static glm::vec3 cam_up;
 	static glm::mat4 P; // P for projection
 	static glm::mat4 V; // V for view
 	static void initialize_objects();

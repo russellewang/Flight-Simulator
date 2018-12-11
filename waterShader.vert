@@ -7,7 +7,8 @@
 // The vertex shader gets called once per vertex.
 
 layout (location = 0) in vec3 position;
-layout (location = 1) in vec2 normal;
+layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 texture;
 
 // Uniform variables can be updated by fetching their location and passing values to that location
 uniform mat4 projection;
@@ -17,8 +18,9 @@ uniform mat4 model;
 // Outputs of the vertex shader are the inputs of the same name of the fragment shader.
 // The default output, gl_Position, should be assigned something. You can define as many
 // extra outputs as you need.
-out vec2 FragNormal;
+out vec3 FragNormal;
 out vec3 FragPos;
+out vec2 textureCoords;
 
 void main()
 {
@@ -26,4 +28,5 @@ void main()
     gl_Position = projection * modelview * vec4(position.x, position.y, position.z, 1.0);
     FragNormal = mat3(transpose(inverse(model))) * normal;
 	FragPos = vec3(model * vec4(position.x, position.y, position.z, 1.0f));
+	textureCoords = texture;
 }

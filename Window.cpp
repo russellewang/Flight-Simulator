@@ -3,16 +3,17 @@
 const char* window_title = "GLFW Starter Project";
 Terrain * terrain;
 Water * water;
+Skybox * skybox;
 GLint terrainShaderProgram;
 GLint waterShaderProgram;
-
+GLint skyShaderProgram;
 // On some systems you need to change this to the absolute path
 
 
 // Default camera parameters
-glm::vec3 cam_pos(0.0f, 30.0f, 30.0f);		// e  | Position of camera
-glm::vec3 cam_look_at(0.0f, 0.0f, 0.0f);	// d  | This is where the camera looks at
-glm::vec3 cam_up(0.0f, 1.0f, 0.0f);			// up | What orientation "up" is
+glm::vec3 Window::cam_pos(20.0f, 30.0f, 60.0f);		// e  | Position of camera
+glm::vec3 Window::cam_look_at(0.0f, 0.0f, 0.0f);	// d  | This is where the camera looks at
+glm::vec3 Window::cam_up(0.0f, 1.0f, 0.0f);			// up | What orientation "up" is
 
 glm::vec3 beginpoint;
 glm::vec3 endpoint;
@@ -31,15 +32,17 @@ void Window::initialize_objects()
 {
 	terrain = new Terrain();
 	water = new Water();
+	skybox = new Skybox();
 	// Load the shader program. Make sure you have the correct filepath up top
 	terrainShaderProgram = LoadShaders("../terrainShader.vert", "../terrainShader.frag");
 	waterShaderProgram = LoadShaders("../waterShader.vert", "../waterShader.frag");
-
+	skyShaderProgram = LoadShaders("../skyboxshader.vert", "../skyboxshader.frag");
 }
 
 // Treat this as a destructor function. Delete dynamically allocated memory here.
 void Window::clean_up()
 {
+	glDeleteProgram(skyShaderProgram);
 	glDeleteProgram(terrainShaderProgram);
 	glDeleteProgram(waterShaderProgram);
 
@@ -119,14 +122,14 @@ void Window::display_callback(GLFWwindow* window)
 	// Clear the color and depth buffers
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glUseProgram(skyShaderProgram);
+	skybox->draw(skyShaderProgram);
+
 	glUseProgram(waterShaderProgram);
 	water->draw(waterShaderProgram);
 
 	// Use the shader of programID
 	glUseProgram(terrainShaderProgram);
-	
-	// Render the cube
-	//cube->draw(shaderProgram);
 	terrain->draw(terrainShaderProgram);
 	// Gets events, including input such as keyboard and mouse or window resizing
 	glfwPollEvents();

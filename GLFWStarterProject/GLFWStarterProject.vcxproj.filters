@@ -61,12 +61,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\shader.frag">
-      <Filter>Source Files</Filter>
-    </None>
-    <None Include="..\shader.vert">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="packages.config" />
     <None Include="..\waterShader.frag">
       <Filter>Source Files</Filter>
@@ -78,6 +72,12 @@
       <Filter>Source Files</Filter>
     </None>
     <None Include="..\skyboxshader.frag">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\terrainShader.vert">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\terrainShader.frag">
       <Filter>Source Files</Filter>
     </None>
   </ItemGroup>

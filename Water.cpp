@@ -5,22 +5,25 @@
 
 Water::Water() {
 	toWorld = glm::mat4(1.0f);
-	//this->skyTexture = sky;
-	vector<const GLchar*> faces;// = new vector< const GLchar*>();
-	faces.push_back("../right.ppm");
-	faces.push_back("../left.ppm");
-	faces.push_back("../top.ppm");
-	faces.push_back("../bottom.ppm");
-	faces.push_back("../back.ppm");
-	faces.push_back("../front.ppm");
+	vector<const GLchar*> faces;
+	faces.push_back("../skyboxTextures/right.ppm");
+	faces.push_back("../skyboxTextures/left.ppm");
+	faces.push_back("../skyboxTextures/top.ppm");
+	faces.push_back("../skyboxTextures/bottom.ppm");
+	faces.push_back("../skyboxTextures/back.ppm");
+	faces.push_back("../skyboxTextures/front.ppm");
 	skytexture = loadCubemap(faces);
+	dudvmap = loadTexture("../dudvMap.ppm");
+	speed = 0.0f;
 	for (int i = 0; i < WIDTH; i++) {
 
 		for (int j = 0; j < WIDTH; j++) {
-			vertices.push_back(glm::vec3((float)j * 2 - (WIDTH), 0.0, (float)i * 2 - (WIDTH)));
-			normals.push_back(glm::vec3(0.0, 1.0, 0.0));
-			textures.push_back(glm::vec2(j, i));
+			vertices.push_back(glm::vec3((float)j*10-(WIDTH*5), 0.0, (float)i*10 - (WIDTH*5)));
+			//vertices.push_back(glm::vec3((float)j - WIDTH / 2, 0.0, (float)i - WIDTH / 2));
 
+			normals.push_back(glm::vec3(0.0, 1.0, 0.0));
+			//textures.push_back(glm::vec2(j * 10 - (WIDTH * 5), i * 10 - (WIDTH * 5)));
+			textures.push_back(glm::vec2(j, i));
 		}
 
 	}
@@ -47,6 +50,7 @@ Water::~Water() {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &VBO2);
+	glDeleteBuffers(1, &VBO3);
 	glDeleteBuffers(1, &EBO);
 }
 
@@ -55,6 +59,7 @@ void Water::setUpWater() {
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 	glGenBuffers(1, &VBO2);
+	glGenBuffers(1, &VBO3);
 
 	// Bind the Vertex Array Object (VAO) first, then bind the associated buffers to it.
 	// Consider the VAO as a container for all your buffers.
@@ -81,7 +86,13 @@ void Water::setUpWater() {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
 	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO3);
+	glBufferData(GL_ARRAY_BUFFER, textures.size() * sizeof(glm::vec2), &textures[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -91,7 +102,8 @@ void Water::setUpWater() {
 void Water::draw(GLuint shaderProgram) {
 	glm::mat4 modelview = Window::V * toWorld;
 
-
+	speed += 0.001f;
+	speed = fmod(speed, 1);
 	// Now send these values to the shader program
 	//glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &toWorld[0][0]);
 	//glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, &Window::V[0][0]);
@@ -99,10 +111,21 @@ void Water::draw(GLuint shaderProgram) {
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &toWorld[0][0]);
 
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, &Window::P[0][0]);
-
+	glUniform3f(glGetUniformLocation(shaderProgram, "viewPos"), Window::cam_pos.x, Window::cam_pos.y, Window::cam_pos.z);
 	// Now draw the cube. We simply need to bind the VAO associated with it.
 	glBindVertexArray(VAO);
+	
+	glUniform1f(glGetUniformLocation(shaderProgram, "speed"), speed);
+
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skytexture);
+	glUniform1i(glGetUniformLocation(shaderProgram, "skybox"), 0);
+	
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, dudvmap);
+	glUniform1i(glGetUniformLocation(shaderProgram, "dudvMap"), 1);
+
+	
 
 	// Tell OpenGL to draw with triangles, using 36 indices, the type of the indices, and the offset to start from
 	glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
@@ -190,3 +213,21 @@ unsigned int Water::loadCubemap(vector<const GLchar*> faces)
 	return textureID;
 }
 
+GLuint Water::loadTexture(const char* filename) {
+	GLuint textureID;
+	int width, height;
+	unsigned char * image;
+	glGenTextures(1, &textureID);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	image = loadPPM(filename, width, height);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	return textureID;
+}

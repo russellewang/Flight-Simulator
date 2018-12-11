@@ -79,7 +79,7 @@ int main(void)
 	setup_opengl_settings();
 	// Initialize objects/pointers for rendering
 	Window::initialize_objects();
-
+	
 	// Loop while GLFW window should stay open
 	while (!glfwWindowShouldClose(window))
 	{

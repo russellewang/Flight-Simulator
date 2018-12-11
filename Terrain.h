@@ -44,7 +44,6 @@ public:
 	unsigned char* loadPPM(const char* filename, int& width, int& height);
 	void draw(GLuint);
 	void diamondSquare(float);
-	void diamond_square(int x1, int x2, int y1, int y2, int level, float range);
 	GLuint loadTerrain(const char*);
 	float fRand(float, float);
 

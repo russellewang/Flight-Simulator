@@ -4,12 +4,12 @@
 Skybox::Skybox() {
 	toWorld = glm::mat4(1.0f);
 	vector<const GLchar*> faces;// = new vector< const GLchar*>();
-	faces.push_back("../right.ppm");
-	faces.push_back("../left.ppm");
-	faces.push_back("../top.ppm");
-	faces.push_back("../bottom.ppm");
-	faces.push_back("../back.ppm");
-	faces.push_back("../front.ppm");
+	faces.push_back("../skyboxTextures/right.ppm");
+	faces.push_back("../skyboxTextures/left.ppm");
+	faces.push_back("../skyboxTextures/top.ppm");
+	faces.push_back("../skyboxTextures/bottom.ppm");
+	faces.push_back("../skyboxTextures/back.ppm");
+	faces.push_back("../skyboxTextures/front.ppm");
 	
 	cubeTexture = loadCubemap(faces);
 	vector<unsigned int> skyboxindices;
