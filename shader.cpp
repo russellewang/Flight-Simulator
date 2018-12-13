@@ -31,8 +31,8 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 			VertexShaderCode += "\n" + Line;
 		VertexShaderStream.close();
 	}else{
-		printf("Impossible to open %s. Check to make sure the file exists and you passed in the right filepath!\n", vertex_file_path);
-		printf("The current working directory is:");
+		//("Impossible to open %s. Check to make sure the file exists and you passed in the right filepath!\n", vertex_file_path);
+		//printf("The current working directory is:");
 		// Please for the love of whatever deity/ies you believe in never do something like the next line of code,
 		// Especially on non-Windows systems where you can have the system happily execute "rm -rf ~"
 #ifdef _WIN32
@@ -59,7 +59,7 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 
 
 	// Compile Vertex Shader
-	printf("Compiling shader : %s\n", vertex_file_path);
+	//printf("Compiling shader : %s\n", vertex_file_path);
 	char const * VertexSourcePointer = VertexShaderCode.c_str();
 	glShaderSource(VertexShaderID, 1, &VertexSourcePointer , NULL);
 	glCompileShader(VertexShaderID);
@@ -73,13 +73,13 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 		printf("%s\n", &VertexShaderErrorMessage[0]);
 	}
 	else {
-		printf("Successfully compiled vertex shader!\n");
+		//printf("Successfully compiled vertex shader!\n");
 	}
 
 
 
 	// Compile Fragment Shader
-	printf("Compiling shader : %s\n", fragment_file_path);
+	//printf("Compiling shader : %s\n", fragment_file_path);
 	char const * FragmentSourcePointer = FragmentShaderCode.c_str();
 	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer , NULL);
 	glCompileShader(FragmentShaderID);
@@ -93,12 +93,12 @@ GLuint LoadShaders(const char * vertex_file_path,const char * fragment_file_path
 		printf("%s\n", &FragmentShaderErrorMessage[0]);
 	}
 	else {
-		printf("Successfully compiled fragment shader!\n");
+		//printf("Successfully compiled fragment shader!\n");
 	}
 
 
 	// Link the program
-	printf("Linking program\n");
+	//printf("Linking program\n");
 	GLuint ProgramID = glCreateProgram();
 	glAttachShader(ProgramID, VertexShaderID);
 	glAttachShader(ProgramID, FragmentShaderID);

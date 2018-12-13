@@ -4,8 +4,8 @@
 #include <vector>
 
 // GL Includes
-#define GLEW_STATIC
-//#include <GL/glew.h>
+//#define GLEW_STATIC
+#include <GL/glew.h>
 
 #include <glm/glm.hpp>
 

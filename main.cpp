@@ -16,9 +16,13 @@ void setup_callbacks()
 	glfwSetKeyCallback(window, Window::key_callback);
 	// Set the window resize callback
 	glfwSetFramebufferSizeCallback(window, Window::resize_callback);
+	// Set the scroll callback
 	glfwSetScrollCallback(window, Window::scroll_callback);
-	glfwSetCursorPosCallback(window, Window::cursor_position_callback);
+	// Set the mouse click callback
 	glfwSetMouseButtonCallback(window, Window::mouse_button_callback);
+	// Set the mouse position callback
+	glfwSetCursorPosCallback(window, Window::cursor_position_callback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 void setup_glew()
@@ -78,8 +82,9 @@ int main(void)
 	// Setup OpenGL settings, including lighting, materials, etc.
 	setup_opengl_settings();
 	// Initialize objects/pointers for rendering
-	Window::initialize_objects();
-	
+    
+    Window::initialize_objects();
+
 	// Loop while GLFW window should stay open
 	while (!glfwWindowShouldClose(window))
 	{
@@ -87,6 +92,7 @@ int main(void)
 		Window::display_callback(window);
 		// Idle callback. Updating objects, etc. can be done here.
 		Window::idle_callback();
+		
 	}
 
 	Window::clean_up();

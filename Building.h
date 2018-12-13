@@ -37,21 +37,36 @@ private:
 	GLuint uProjection, uModelView;
 	const float PI = 3.1415927;
 	GLuint texture[1];
-	std::vector<const char *> skyscraper_textures = { "../skyscraper.ppm", "../frontendlarge.ppm", "../skyscraperGlass.ppm" };
+	std::vector<const char *> skyscraper_textures = { 
+		"skyscraperGlass.ppm", 
+		"bwglass.ppm",
+		"highRise.ppm",
+		"1.ppm",
+		"32.ppm",
+		"33.ppm",
+		"34.ppm",
+		"59.ppm",
+		"69.ppm",
+		"71.ppm",
+		"72.ppm",
+		"76.ppm",
+		"81.ppm",
+	};
+	glm::vec3 reshapeVertex(float , float , float , float , glm::vec3*);
+	void loadBuffers();
+	void parse(const char * , glm::vec3 * , int );
+	void loadTexture();
+	unsigned char* loadPPM(const char*, int&, int&);
 
 public:
+	void loadTexture(const char *);
+	const char * texfile;
 
 	void draw(Camera* camera, GLuint shader);
 
-	void skyscraper(const char*, glm::vec3*, int);
-	void officeBldg(const char*, glm::vec3*, int);
-	void house(const char*, glm::vec3*, int);
-
-	Building(const char*, glm::vec3*, float, int);
+	Building(const char*, glm::vec3*, int);
 	~Building();
 
-	void loadTexture();
-	unsigned char* loadPPM(const char*, int&, int&);
 };
 
 #endif /* Geometry_hpp */

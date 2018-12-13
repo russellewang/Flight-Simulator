@@ -257,9 +257,10 @@ void Geometry::init2(const char* filename, float scaleSize) {
 void Geometry::draw(Camera* C, GLuint shader) {
 
 	// Set this texture to be the one we are working with
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
 
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
     
     uProjection = glGetUniformLocation(shader, "projection");
     uModelView = glGetUniformLocation(shader, "modelview");
@@ -275,9 +276,6 @@ void Geometry::draw(Camera* C, GLuint shader) {
     glUniform3f(glGetUniformLocation(shader, "camPos"), C->GetPosition().x, C->GetPosition().y, C->GetPosition().z);
     // Now draw the cube. We simply need to bind the VAO associated with it.
     glBindVertexArray(VAO);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture[0]);
-
     // Tell OpenGL to draw with triangles, using 36 indices, the type of the indices, and the offset to start from
     glDrawElements(GL_TRIANGLES, (unsigned int)indices.size(), GL_UNSIGNED_INT, 0);
     // Unbind the VAO when we're done so we don't accidentally draw extra stuff or tamper with its bound buffers
@@ -350,7 +348,7 @@ void Geometry::loadTexture()
     unsigned char* tdata;  // texture pixel data
     
     // Load image file
-    tdata = loadPPM("../plane.PPM", twidth, theight);
+    tdata = loadPPM("plane.PPM", twidth, theight);
     if (tdata==NULL) {
         std::cout << "tdata is NULL" << std::endl;
         return;
