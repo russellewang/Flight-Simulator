@@ -23,7 +23,7 @@ private:
 	struct Zones {
 		
 		//City Center
-		glm::vec3 CCCoordinates = glm::vec3(27.5f, 5.0f, 0.0f);
+		glm::vec3 CCCoordinates = glm::vec3(-125.5f, 5.0f, 0.0f);
 		float CCRadiusMax = 5.0f;
 		int CCFloorMax = 20;
 		int CCFloorMin = 15;
