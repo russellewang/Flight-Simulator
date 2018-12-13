@@ -350,7 +350,7 @@ void Geometry::loadTexture()
     unsigned char* tdata;  // texture pixel data
     
     // Load image file
-    tdata = loadPPM("plane.PPM", twidth, theight);
+    tdata = loadPPM("../plane.PPM", twidth, theight);
     if (tdata==NULL) {
         std::cout << "tdata is NULL" << std::endl;
         return;
