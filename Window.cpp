@@ -7,8 +7,10 @@ Skybox * skybox;
 GLint terrainShaderProgram;
 GLint waterShaderProgram;
 GLint skyShaderProgram;
+GLint shaderProgram;
 // On some systems you need to change this to the absolute path
-
+#define VERTEX_SHADER_PATH "../shader.vert"
+#define FRAGMENT_SHADER_PATH "../shader.frag"
 
 // Default camera parameters
 glm::vec3 Window::cam_pos(20.0f, 30.0f, 60.0f);		// e  | Position of camera
@@ -21,6 +23,24 @@ double Window::xmouse = 0;
 double Window::ymouse = 0;
 bool Window::left_click = false;
 
+// Timed Events
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
+
+glm::vec2 mousePos;
+bool keys[1024];
+bool Window::leftClick;
+glm::vec2 camEuler = glm::vec2(0, glm::pi<float>());
+
+Camera* camera;
+City* city;
+Geometry* plane;
+std::vector<Transform*> objects;
+
+float planeSpeed = 10.0f;
+float planePitchSpeed = .5f;
+float planeYawSpeed = .5;
+float planeRollSpeed = .5f;
 
 int Window::width;
 int Window::height;
@@ -30,6 +50,23 @@ glm::mat4 Window::V;
 
 void Window::initialize_objects()
 {
+	camera = new Camera();
+	camera->SetFov(45.0f);
+	camera->SetAspect((float)Window::width / Window::height);
+	camera->SetPosition(glm::vec3(0.03f, 3.0f, -2.0f));
+	camera->SetRotation(glm::quat(glm::vec3(camEuler, 0.0f)));
+
+	plane = new Geometry("../plane.obj", .05f/*1.0f*/, true);
+	//plane = new Geometry("limb_s.obj", 0.1f, false);
+	plane->addChild((Transform*)camera);
+	plane->SetPosition(glm::vec3(0.0f, 30.0f, -200.0f));
+	objects.push_back((Transform*)plane);
+
+	// Create city / Load buildings into objects vector
+	city = new City(&objects);
+
+	// Load the shader program. Make sure you have the correct filepath up top
+	shaderProgram = LoadShaders(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 	terrain = new Terrain();
 	water = new Water();
 	skybox = new Skybox();
@@ -104,7 +141,7 @@ void Window::resize_callback(GLFWwindow* window, int width, int height)
 	Window::height = height;
 	// Set the viewport size. This is the only matrix that OpenGL maintains for us in modern OpenGL!
 	glViewport(0, 0, width, height);
-
+	if (camera) camera->SetAspect((float)width / height);
 	if (height > 0)
 	{
 		P = glm::perspective(45.0f, (float)width / (float)height, 0.1f, 1000.0f);
@@ -114,7 +151,33 @@ void Window::resize_callback(GLFWwindow* window, int width, int height)
 
 void Window::idle_callback()
 {
-	// Call the update function the cube
+	GLfloat currentFrame = glfwGetTime();
+	deltaTime = currentFrame - lastFrame;
+	lastFrame = currentFrame;
+
+	glm::vec3 p = plane->GetPosition();
+	glm::quat r = plane->GetWorldRotation();
+	glm::vec3 fwd = glm::vec3(r * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+	plane->SetPosition(p + fwd * planeSpeed * deltaTime);
+
+	glm::quat lr = plane->GetRotation();
+
+	if (keys[GLFW_KEY_W])
+		lr *= glm::quat(glm::vec3(planePitchSpeed * deltaTime, 0.0f, 0.0f));
+	else if (keys[GLFW_KEY_S])
+		lr *= glm::quat(glm::vec3(-planePitchSpeed * deltaTime, 0.0f, 0.0f));
+
+	if (keys[GLFW_KEY_Q])
+		lr *= glm::quat(glm::vec3(0.0f, planeYawSpeed * deltaTime, 0.0f));
+	else if (keys[GLFW_KEY_E])
+		lr *= glm::quat(glm::vec3(0.0f, -planeYawSpeed * deltaTime, 0.0f));
+
+	if (keys[GLFW_KEY_A])
+		lr *= glm::quat(glm::vec3(0.0f, 0.0f, -planeRollSpeed * deltaTime));
+	else if (keys[GLFW_KEY_D])
+		lr *= glm::quat(glm::vec3(0.0f, 0.0f, planeRollSpeed * deltaTime));
+
+	plane->SetRotation(lr);
 }
 
 void Window::display_callback(GLFWwindow* window)
@@ -123,18 +186,24 @@ void Window::display_callback(GLFWwindow* window)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glUseProgram(skyShaderProgram);
-	skybox->draw(skyShaderProgram);
+	skybox->draw(camera, skyShaderProgram);
 
 	glUseProgram(waterShaderProgram);
-	water->draw(waterShaderProgram);
+	water->draw(camera, waterShaderProgram);
 
 	// Use the shader of programID
 	glUseProgram(terrainShaderProgram);
-	terrain->draw(terrainShaderProgram);
+	terrain->draw(camera, terrainShaderProgram);
 	// Gets events, including input such as keyboard and mouse or window resizing
+	glUseProgram(shaderProgram);
+
+	for (int i = 0; i < objects.size(); i++) {
+		objects[i]->draw(camera, shaderProgram);
+	}
 	glfwPollEvents();
 	// Swap buffers
 	glfwSwapBuffers(window);
+
 }
 
 void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -142,29 +211,35 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
 	// Check for a key press
 	if (action == GLFW_PRESS)
 	{
-		// Check if escape was pressed
-		if (key == GLFW_KEY_ESCAPE)
-		{
-			// Close the window. This causes the program to also terminate.
+		switch (key) {
+		case GLFW_KEY_ESCAPE:
 			glfwSetWindowShouldClose(window, GL_TRUE);
+			break;
+		case GLFW_KEY_I:
+			camera->SetFov(camera->GetFov() - 5);
+			break;
+		case GLFW_KEY_O:
+			camera->SetFov(camera->GetFov() + 5);
+			break;
 		}
+	}
+
+	if (key >= 0 && key < 1024)
+	{
+		if (action == GLFW_PRESS)
+			keys[key] = true;
+		else if (action == GLFW_RELEASE)
+			keys[key] = false;
 	}
 }
 
 void Window::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
 
-	if (action == GLFW_PRESS) {
-		if (button == GLFW_MOUSE_BUTTON_LEFT) {
-			left_click = true;
-			glfwGetCursorPos(window, &xmouse, &ymouse);
-		}
-
-	}
-
-	if (action == GLFW_RELEASE) {
-		if (button == GLFW_MOUSE_BUTTON_LEFT) {
-			left_click = false;
-		}
+	if (button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (GLFW_PRESS == action)
+			Window::leftClick = true;
+		else if (GLFW_RELEASE == action)
+			Window::leftClick = false;
 	}
 
 }
@@ -185,29 +260,16 @@ void Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 void Window::cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
 
-	if (left_click) {
+	if (Window::leftClick) {
+		float dx = (xpos - mousePos.x) * .01f;
+		float dy = (ypos - mousePos.y) * .01f;
 
+		camEuler += glm::vec2(-dy, -dx);
+		camera->SetRotation(glm::quat(glm::vec3(camEuler, 0.0f)));
 
-		double newxpos = 0;
-		double newypos = 0;
-		glfwGetCursorPos(window, &newxpos, &newypos);
-
-		beginpoint = trackBallMapping(xmouse, ymouse);
-		endpoint = trackBallMapping(newxpos, newypos);
-
-		float angle = glm::acos((glm::dot(beginpoint, endpoint) / (glm::length(beginpoint)*glm::length(endpoint))));
-		glm::vec3 vector = glm::cross(beginpoint, endpoint);
-
-		glm::mat4 translation = glm::rotate(glm::mat4(1.0f), angle / 180.0f * glm::pi<float>(), vector);
-		//camera->rotate(angle, vector);
-		cam_pos = glm::vec3(translation * glm::vec4(cam_pos, 0.0));
-		cam_up = glm::vec3(translation * glm::vec4(cam_up, 0.0));
-		
-		V = glm::lookAt(cam_pos, cam_look_at, cam_up);
-		
-		
-		beginpoint = endpoint;
 	}
+	mousePos.x = xpos;
+	mousePos.y = ypos;
 
 }
 

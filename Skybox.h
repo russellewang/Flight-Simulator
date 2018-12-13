@@ -9,6 +9,8 @@
 #include <iostream>
 #include <vector>
 #include <stdio.h>
+#include "Camera.h"
+
 //#include <stdlib.h>
 //#include <math.h>   // include math functions, such as sin, cos, M_PI
 
@@ -24,7 +26,7 @@ public:
 	~Skybox();
 	glm::mat4 toWorld;
 	GLuint cubeTexture;
-	void draw(GLuint);
+	void draw(Camera*, GLuint);
 	unsigned int loadCubemap(vector<const GLchar*> faces);
 	unsigned char* loadPPM(const char* filename, int& width, int& height);
 };

@@ -99,19 +99,20 @@ void Water::setUpWater() {
 	glBindVertexArray(0);
 }
 
-void Water::draw(GLuint shaderProgram) {
-	glm::mat4 modelview = Window::V * toWorld;
+void Water::draw(Camera* C,GLuint shaderProgram) {
+	glm::mat4 modelview = C->GetView() * toWorld;
+	glm::mat4 projection = C->GetProjection();
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelview"), 1, GL_FALSE, &modelview[0][0]);
 
 	speed += 0.001f;
 	speed = fmod(speed, 1);
 	// Now send these values to the shader program
 	//glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &toWorld[0][0]);
 	//glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, &Window::V[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelview"), 1, GL_FALSE, &modelview[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &toWorld[0][0]);
-
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, &Window::P[0][0]);
-	glUniform3f(glGetUniformLocation(shaderProgram, "viewPos"), Window::cam_pos.x, Window::cam_pos.y, Window::cam_pos.z);
+	glm::vec3 cam_pos = C->GetWorldPosition();
+	glUniform3f(glGetUniformLocation(shaderProgram, "viewPos"), cam_pos.x, cam_pos.y, cam_pos.z);
 	// Now draw the cube. We simply need to bind the VAO associated with it.
 	glBindVertexArray(VAO);
 	

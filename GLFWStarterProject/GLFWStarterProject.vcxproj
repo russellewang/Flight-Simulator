@@ -19,24 +19,37 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Building.h" />
+    <ClInclude Include="..\Camera.h" />
+    <ClInclude Include="..\City.h" />
     <ClInclude Include="..\Cube.h" />
+    <ClInclude Include="..\Geometry.hpp" />
     <ClInclude Include="..\main.h" />
+    <ClInclude Include="..\Node.hpp" />
     <ClInclude Include="..\shader.h" />
     <ClInclude Include="..\Skybox.h" />
     <ClInclude Include="..\Terrain.h" />
+    <ClInclude Include="..\Transform.hpp" />
     <ClInclude Include="..\Water.h" />
     <ClInclude Include="..\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Building.cpp" />
+    <ClCompile Include="..\City.cpp" />
     <ClCompile Include="..\Cube.cpp" />
+    <ClCompile Include="..\Geometry.cpp" />
     <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\Node.cpp" />
     <ClCompile Include="..\shader.cpp" />
     <ClCompile Include="..\Skybox.cpp" />
     <ClCompile Include="..\Terrain.cpp" />
+    <ClCompile Include="..\Transform.cpp" />
     <ClCompile Include="..\Water.cpp" />
     <ClCompile Include="..\Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\shader.frag" />
+    <None Include="..\shader.vert" />
     <None Include="..\skyboxshader.frag" />
     <None Include="..\skyboxshader.vert" />
     <None Include="..\terrainShader.frag" />

@@ -24,10 +24,10 @@ Skybox::Skybox() {
 	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices)*3*sizeof(GLfloat), &skyvertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyvertices)*3*sizeof(GLfloat), &skyvertices[0], GL_STATIC_DRAW);
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices)*sizeof(int), &skyboxindices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(skyindices)*sizeof(int), &skyboxindices[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0,// This first parameter x should be the same as the number passed into the line "layout (location = x)" in the vertex shader. In this case, it's 0. Valid values are 0 to GL_MAX_UNIFORM_LOCATIONS.
@@ -43,10 +43,11 @@ Skybox::Skybox() {
 }
 
 
-void Skybox::draw(GLuint shaderProgram) {
-	glm::mat4 modelview = Window::V * toWorld;
+void Skybox::draw(Camera* C, GLuint shaderProgram) {
+	glm::mat4 modelview = C->GetView() * toWorld;
+	glm::mat4 projection = C->GetProjection();
 	glDepthMask(GL_FALSE);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, &Window::P[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "modelview"), 1, GL_FALSE, &modelview[0][0]);
 	
 	glBindVertexArray(VAO);

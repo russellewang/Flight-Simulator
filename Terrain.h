@@ -16,6 +16,7 @@
 #include <math.h>   
 #include <iomanip>
 #include <iostream> 
+#include "Camera.h"
 
 using namespace std;
 
@@ -42,7 +43,7 @@ public:
 	Terrain();
 	~Terrain();
 	unsigned char* loadPPM(const char* filename, int& width, int& height);
-	void draw(GLuint);
+	void draw(Camera*, GLuint);
 	void diamondSquare(float);
 	GLuint loadTerrain(const char*);
 	float fRand(float, float);

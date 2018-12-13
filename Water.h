@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <math.h>   
 #include <iostream> 
+#include "Camera.h"
 
 using namespace std;
 
@@ -41,7 +42,7 @@ public:
 	unsigned int loadCubemap(vector<const GLchar*> faces);
 	Water();
 	~Water();
-	void draw(GLuint);
+	void draw(Camera*,GLuint);
 	GLuint loadTexture(const char*);
 
 

@@ -16,6 +16,13 @@
 #include "Water.h"
 #include "Skybox.h"
 
+#include "Transform.hpp"
+#include "City.h"
+#include "Geometry.hpp"
+#include "Camera.h"
+#include "Building.h"
+
+
 class Window
 {
 public:
@@ -40,6 +47,14 @@ public:
 	static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 	static glm::vec3 Window::trackBallMapping(double x, double y);
 	static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
+
+
+
+
+	static bool leftClick;
+	static double curxPos;
+	static double curyPos;
+
 };
 
 #endif
